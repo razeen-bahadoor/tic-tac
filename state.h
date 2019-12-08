@@ -8,8 +8,8 @@
 #define STATE_H
 
 typedef enum {
-	CELL_NOT_EMPTY,
-	INVALID_MOVE,
-	VALID_MOVE
+	"WIN",
+	"DRAW",
+	"CONTINUE"
 } State;
 #endif

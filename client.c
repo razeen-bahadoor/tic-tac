@@ -2,58 +2,116 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <netdb.h>
 #include <stdlib.h>
 #include <strings.h>
-#include <unistd.h>
+#include "player.h"
+#include "board.h"
+#include "game.h"
 #define PORT_NUM 51717
-#define h_addr h_addr_list[0]
+
 
 
 int main(int argc, char *argv[]) {
+	
+	
+	int sock_fd,val;
+	struct sockaddr_in clie_addr;
+	
 
-	int sock_fd, n;
-	struct sockaddr_in server_addr;
-	struct hostent *host_info;
-	char buffer[256];
-	if (argc < 2) {
-		fprintf(stderr, "usage %s hostname", argv[0]);
+	if (argc < 2 ) {
+		printf("ERROR: usage /.%s <server ip>", argv[0]);
 		exit(1);
 	}
 	
+	/*create the socket*/
 	sock_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock_fd < 0) {
-		fprintf(stderr, "error opening socket");
-		exit(1); 
-	}
-
-	host_info = gethostbyname(argv[1]);
-	
-	if (host_info == NULL) {
-
-		fprintf(stderr, "host not found");
-		exit(1);
-	}
-	bzero((char *) &server_addr,sizeof(server_addr));
-
-	server_addr.sin_family = AF_INET;
-	bcopy((char *)host_info->h_addr, (char *) &server_addr.sin_addr.s_addr, host_info->h_length);
-
-	server_addr.sin_port = htons(PORT_NUM);
-
-	if (connect(sock_fd, (struct sockaddr *) &server_addr,sizeof(server_addr) )<0) {
-		fprintf(stderr, "error connecting");
+		fprintf(stderr,"socket creation failed");
 		exit(1);
 	}
 	
-	bzero(buffer,256);
-	n = read(sock_fd,buffer,255);
-	if (n<0) {
-		fprintf(stderr,"error reading from socket");
+	clie_addr.sin_family = AF_INET;
+	clie_addr.sin_port = htons(PORT_NUM);
+
+	if (inet_pton(AF_INET, argv[1], &clie_addr.sin_addr) <= 0) {
+		fprintf(stderr, "invalid ip address");
 		exit(1);
 	}
+
+	/*connect to the server*/
+		
+	if (connect(sock_fd, (struct sockaddr *)&clie_addr, sizeof(clie_addr)) <0) {
+
+		fprintf(stderr, "connection to server failed");
+		exit(1);
+	}
+
 	
-	printf("%s\n", buffer);
+
+
+	Player p;
+	char game_state[256];
+
+	int x_temp,y_temp;
+	int32_t x,y;
+	init_player(&p, 'O');
+	/*send name here*/
+	/*read name here*/
+	while (1){
+
+		
+		print_board("raz");
+		/*read move from server here*/
+		
+		recv(sock_fd,&x, sizeof(x),0 );
+
+		x_temp = ntohl(x);
+		recv(sock_fd,&y,sizeof(y),0);
+
+		y_temp = ntohl(y);
+		
+		place_piece(x_temp,y_temp,'X');
+
+		bzero(game_state,sizeof(game_state));
+		read(sock_fd,game_state,255);
+		
+		if (strcmp(game_state, "WIN") == 0) {
+					print_board("raz");
+			printf("player has won");
+			exit(1);
+		} else if (strcmp(game_state, "DRAW") ==0) {
+					print_board("raz");
+			printf("players have drawn");
+			exit(1);
+		} else {
+		
+		}
+
+		print_board("zen");
+		get_move(&x_temp,&y_temp);	
+		place_piece(x_temp,y_temp,p.player_symbol);
+
+		/*write move to server here*/
+		x = htonl(x_temp);
+		y = htonl(y_temp);
+
+		send(sock_fd,&x,sizeof(x), 0);
+		send(sock_fd,&y,sizeof(y), 0);
+
+		bzero(game_state,sizeof(game_state));
+		strcpy(game_state, game_status(p,x_temp,y_temp));
+		write(sock_fd,game_state,strlen(game_state));
+		if (strcmp(game_state, "WIN") == 0) {
+			printf("player has won");
+			exit(1);
+		} else if (strcmp(game_state, "DRAW") ==0) {
+			printf("players have drawn");
+			exit(1);
+		} else {
+		
+		}
+
+	}
 	return EXIT_SUCCESS;
 	
 

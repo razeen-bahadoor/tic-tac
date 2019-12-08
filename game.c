@@ -3,15 +3,10 @@
 #include "board.h"
 #include "boolean.h"
 #include "player.h"
-#include "game.h"
 #include "ctype.h"
-int main(int argc, char *argv[]){
-	int x=0;
-	int y =0;
+#include "game.h"
 
-	
 
-}
 
 void get_move(int *x, int  *y) {
 
@@ -66,32 +61,24 @@ Boolean is_valid_move(int x, int y) {
 	
 
 }
-void init_game(Player *p1, Player *p2){
+void init_player(Player *p,char player_sym) {
 	
-	printf("Player 1 please enter your name: ");
-	
-	
-
-
-	fgets(p1->player_name, 255, stdin);
-
-	p1->player_symbol = 'X';
-	
-	printf("Player 2 please enter your name: ");
-	fgets(p2->player_name, 255, stdin);
-
-	p2->player_symbol = 'O';
+	printf("Player,please enter your name: ");
+	fgets(p->player_name, 255, stdin);
+	p->player_symbol = player_sym;
 	printf("\n");
 
 	
 }
 
-void game_status(Player p, int x, int y){
+char* game_status(Player p, int x, int y){
 	
 	if (check_win(p,x,y) == TRUE) {
-		printf("player has won");
+		return "WIN";
 	} else if (is_full() == TRUE) {
-		printf("draw");
+		return "DRAW";
+	} else {
+		return "CONTINUE";	
 	}
 
 }
@@ -174,10 +161,10 @@ Boolean check_win(Player p, int x, int y){
 
 
 
-void print_board(Player p) {
+void print_board(char name[]) {
 	int row,col;
 	printf("Player 1: X Player 2: O\n");
-	printf("Turn: %s\n", p.player_name);
+	printf("Turn: %s\n", name);
 	printf("\n");
 	printf("  0 1 2\n");
 	for(row =0; row<3; row++) {

@@ -13,7 +13,7 @@
 * @param[p1]
 * @param[p2]
 */
-void init_game(Player *p1,Player *p2);
+void init_player(Player *p, char player_sym);
 
 
 
@@ -43,7 +43,7 @@ Boolean is_valid_move(int x, int y);
 *
 * @param[p] the current player 
 */
-void game_status(Player p, int x, int y);
+char* game_status(Player p, int x, int y);
 
 Boolean check_win(Player p, int x, int y);
 
@@ -52,6 +52,6 @@ Boolean check_win(Player p, int x, int y);
 *
 * @param board[][] the board to print 
 */
-void print_board(Player p);
+void print_board(char name[]);
 
 #endif

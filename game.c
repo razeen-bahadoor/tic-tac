@@ -65,6 +65,7 @@ void init_player(Player *p,char player_sym) {
 	
 	printf("Player,please enter your name: ");
 	fgets(p->player_name, 255, stdin);
+	p->player_name[strlen(p->player_name) - 1] = '\0';
 	p->player_symbol = player_sym;
 	printf("\n");
 

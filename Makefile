@@ -1,57 +1,31 @@
-#
-# Makefile for CS244 Tutorial 6 (2019)
-#
+#compiler flags
 
-# compiler flags
-DEBUGGER   = -ggdb
-OPTIMISE   = -O0
-WARNINGS   = -Wall -Wextra -pedantic -ansi
-ARCH       = -m32
-AFLAGS     = -g -f elf32
-CFLAGS     = $(DEBUGGER) $(OPTIMISE) $(WARNINGS) $(ARCH)
-DFLAGS     = # up to you...
+DEBUG = -ggdb
+FLAVOUR = -ansi -pedantic
+OPTIMIZE = -O0
+WARNINGS = -Wall
+CFLAGS = $(DEBUG) $(FLAVOUR) $(OPTIMIZE) $(WARNINGS)
 
-# commands
-ASM        = nasm
-CC         = gcc
-RM         = rm -rf
-MKDIR      = mkdir -p
-COMPILE    = $(CC) $(CFLAGS) $(DFLAGS)
-ASSEMBLE   = $(ASM) $(AFLAGS)
-INSTALL    = install
+#commands
+CC = gcc
+RM = rm -f
+COMPILE = $(CC) $(CFLAGS)
 
-# directories
-BINDIR     = ../bin
-LOCALBIN   = ~/.local/bin
+#rules 
+all: client
 
-# targets
-TARGETS    = hcompress
-LIBRARIES  = heap huffman
-OBJECTS    = $(foreach OBJ, $(LIBRARIES), $(addsuffix .o, $(OBJ)))
+client: client.c game board
+	$(COMPILE) -o client client.c game.o board.o
+all: server
+server: server.c game board
+	$(COMPILE) -o server server.c game.o board.o
 
-### RULES ######################################################################
-
-.PHONY: all clean install uninstall
-
-all: $(TARGETS)
-
-$(TARGETS): %: %.c $(LIBRARIES) | $(BINDIR)
-	$(COMPILE) -o $(BINDIR)/$@ $< $(OBJECTS)
-
-$(LIBRARIES): %: %.asm %.h
-	$(ASSEMBLE) $<
-
-$(BINDIR):
-	$(MKDIR) $(BINDIR)
+game: game.c game.h 
+	$(COMPILE) -c game.c
+board: board.c board.h
+	$(COMPILE) -c board.c
 
 clean:
-	$(RM) $(foreach EXE, $(TARGETS), $(wildcard $(BINDIR)/$(EXE)))
-	$(RM) $(foreach OBJ, $(OBJECTS), $(OBJ))
-
-install:
-	$(MKDIR) $(LOCALBIN)
-	$(INSTALL) $(foreach EXE, $(TARGETS), $(wildcard $(BINDIR)/$(EXE))) \
-		$(LOCALBIN)
-
-uninstall:
-	$(RM) $(foreach EXE, $(TARGETS), $(wildcard $(LOCALBIN)/$(EXE)))
+	$(RM) *.o
+	$(RM) server
+	$(RM) client

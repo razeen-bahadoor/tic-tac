@@ -11,13 +11,6 @@
 
 
 /**
-* @brief initialises the game board
-*/
-void init_board(void);
-
-
-
-/**
 * @brief places the players piece at position (x,y)
 *
 * @param[x] x coordinate
@@ -26,7 +19,7 @@ void init_board(void);
 *
 * @return true/false
 */
-void place_piece(int x,int y,char piece);
+void place_piece(int x, int y, char piece);
 
 
 
@@ -45,9 +38,11 @@ Boolean is_empty(int x, int y);
 /**
 * @brief checks whether the board is full
 *
-* @return 
+* @return true/false
 */
 Boolean is_full(void);
+
+
 /**
 * @brief returns the player piece at position (x,y)
 *

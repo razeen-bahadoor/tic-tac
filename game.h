@@ -45,6 +45,14 @@ Boolean is_valid_move(int x, int y);
 */
 char* game_status(Player p, int x, int y);
 
+/**
+* @brief check whether a player has won  
+*
+* @param[p] the current player 
+* @param[x] x coord of last play
+* @param[y] y coord of last play
+* @return true/false
+*/
 Boolean check_win(Player p, int x, int y);
 
 /**
